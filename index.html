@@ -186,6 +186,16 @@ details.panel summary{cursor:pointer;font-weight:700}
 .my-ans li{display:flex;gap:10px}
 .my-ans span{flex:none;width:84px;color:var(--muted);font-size:13px}
 
+/* 결과 공유 창 */
+.sheet-back{position:fixed;inset:0;z-index:30;background:rgba(43,29,34,.45);display:flex;align-items:flex-end;justify-content:center;padding:max(16px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 0 max(12px,env(safe-area-inset-left,0px))}
+.sheet{background:var(--bg);width:100%;max-width:480px;max-height:92vh;overflow-y:auto;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));display:grid;gap:12px;box-sizing:border-box}
+.sheet-head{display:flex;justify-content:space-between;align-items:center}
+.sheet-head strong{font-family:var(--font-display);font-weight:400;font-size:22px}
+.sheet img{width:100%;height:auto;border-radius:14px;border:1px solid var(--line)}
+.sheet .form-actions .btn{flex:1;text-align:center}
+.sheet-note{font-size:12.5px;color:var(--muted)}
+.sheet-ok{color:var(--ok);font-size:13.5px;font-weight:700;min-height:1em}
+
 footer{border-top:1px solid var(--line);padding-block:18px 28px;color:var(--muted);font-size:12.5px}
 footer ul{margin:6px 0 0;padding-left:18px;display:grid;gap:2px}
 
@@ -298,6 +308,7 @@ footer ul{margin:6px 0 0;padding-left:18px;display:grid;gap:2px}
       <div class="check" id="check"></div>
       <div class="meter" aria-hidden="true"><i id="meter"></i></div>
       <div class="verdict"><b id="verdict">아직 체크 전이에요</b><span id="verdict-sub">0 / 8</span></div>
+      <div class="form-actions"><button class="btn ghost small" type="button" data-share="check">결과 공유하기</button></div>
     </div>
   </section>
 
@@ -356,6 +367,20 @@ footer ul{margin:6px 0 0;padding-left:18px;display:grid;gap:2px}
     </form>
   </section>
 </main>
+
+<div class="sheet-back" id="sheet" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t">
+    <div class="sheet-head"><strong id="sheet-t">결과 공유하기</strong><button class="textbtn" type="button" data-sheet="close">닫기</button></div>
+    <img id="sheet-img" alt="공유할 결과 카드">
+    <p class="sheet-note">이미지를 길게 누르거나(휴대폰) 오른쪽 클릭(컴퓨터)해서 저장한 뒤 카카오톡, 인스타그램에 올려 주세요.</p>
+    <div class="form-actions">
+      <button class="btn" type="button" data-sheet="share" id="sheet-share" hidden>카톡·인스타로 보내기</button>
+      <button class="btn" type="button" data-sheet="save">이미지 저장</button>
+      <button class="btn ghost" type="button" data-sheet="copy">문구·링크 복사</button>
+    </div>
+    <p class="sheet-ok" id="sheet-ok" role="status"></p>
+  </div>
+</div>
 
 <footer>
   <div class="wrap">
@@ -509,6 +534,10 @@ function renderMatch(){
 }
 
 document.addEventListener("click",e=>{
+  const sh=e.target.closest("[data-share]");
+  if(sh){openShare(sh.dataset.share);return}
+  const sa=e.target.closest("[data-sheet]");
+  if(sa){sheetAction(sa.dataset.sheet);return}
   const f=e.target.closest("[data-f]");
   if(f){S.filter=f.dataset.f;document.querySelectorAll("[data-f]").forEach(x=>x.setAttribute("aria-pressed",x===f));renderMatch();return}
   const l=e.target.closest("[data-like]");
@@ -670,10 +699,11 @@ function renderGame(){
   const played=list.filter(p=>p.balance).map(p=>({p,n:same(mine,p.balance)})).sort((x,y)=>y.n-x.n);
   const waiting=list.length-played.length;
   const best=played[0];
+  LAST.bal={chip:"밸런스 게임 · 나의 연애 취향",who:(S.me&&S.me.nickname)||"나",big:best?`${best.n}/${N}`:"",msg:best?`가장 잘 맞는 사람과 ${best.n}개 같은 답!`:"연애 밸런스 게임, 나는 이걸 골랐어요",small:true,lines:BALANCE.map((q,i)=>`${q.k}: ${mine[i]?q.b:q.a}`),text:best?`[두근] 연애 밸런스 게임 해 봤는데, 가장 잘 맞는 사람과 ${N}문제 중 ${best.n}개가 같았어요! 너는 뭐 고를래?`:`[두근] 연애 밸런스 게임 해 봤어요. 너는 뭐 고를래?`};
   let html=`<div class="panel pink">
     <strong>${best?`가장 잘 맞는 사람은 ${esc(best.p.nickname)}님이에요 (${best.n} / ${N})`:"게임 결과를 저장했어요"}</strong>
     <p class="lead">${S.me?"결과가 내 프로필에 저장됐어요. 같은 답을 많이 고른 사람부터 보여드려요.":"아직 프로필이 없어서 결과는 이 기기에만 저장됐어요. 프로필을 만들면 이성 회원만 골라서 보여드리고 좋아요를 보낼 수 있어요."}</p>
-    <div class="form-actions"><button class="btn" type="button" data-game="start">다시 하기</button>${S.me?"":`<a class="btn ghost" href="#profile" style="text-decoration:none">프로필 만들기</a>`}</div>
+    <div class="form-actions"><button class="btn" type="button" data-share="bal">결과 공유하기</button><button class="btn ghost" type="button" data-game="start">다시 하기</button>${S.me?"":`<a class="btn ghost" href="#profile" style="text-decoration:none">프로필 만들기</a>`}</div>
   </div>
   <details class="panel"><summary>내가 고른 답 보기</summary><ul class="my-ans">${BALANCE.map((q,i)=>`<li><span>${esc(q.k)}</span>${esc(mine[i]?q.b:q.a)}</li>`).join("")}</ul></details>`;
   if(!played.length){
@@ -716,6 +746,92 @@ function finishGame(){
   renderMatch();
   toast("밸런스 게임 결과를 저장했어요");
 }
+
+/* ---------- 결과 공유 ---------- */
+const SHARE_URL="https://yunc16.github.io/dugeun-match/";
+const LAST={};
+let shareBlob=null,shareText="",shareUrlObj=null;
+function heartPath(x,cx,cy,s){x.beginPath();x.moveTo(cx,cy+s*0.9);x.bezierCurveTo(cx-s*1.4,cy,cx-s*0.9,cy-s*1.1,cx,cy-s*0.35);x.bezierCurveTo(cx+s*0.9,cy-s*1.1,cx+s*1.4,cy,cx,cy+s*0.9);x.closePath();x.fill()}
+function rr(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()}
+function wrapText(x,t,maxW){
+  const out=[];let cur="";
+  for(const w of String(t).split(" ")){
+    const test=cur?cur+" "+w:w;
+    if(x.measureText(test).width<=maxW){cur=test;continue}
+    if(cur)out.push(cur);cur=w;
+    while(x.measureText(cur).width>maxW){let i=cur.length;while(i>1&&x.measureText(cur.slice(0,i)).width>maxW)i--;out.push(cur.slice(0,i));cur=cur.slice(i)}
+  }
+  if(cur)out.push(cur);return out;
+}
+async function drawCard(c){
+  try{await Promise.all([document.fonts.load('80px "Jua"'),document.fonts.load('bold 40px "Noto Sans KR"'),document.fonts.load('40px "Noto Sans KR"')])}catch(e){}
+  const W=1080,H=1350,cv=document.createElement("canvas");cv.width=W;cv.height=H;const x=cv.getContext("2d");
+  const D='"Jua","Noto Sans KR",sans-serif',B='"Noto Sans KR",sans-serif';
+  x.fillStyle="#ffffff";x.fillRect(0,0,W,H);
+  x.fillStyle="#fff4f6";rr(x,40,40,W-80,H-80,56);x.fill();
+  x.strokeStyle="#e8436a";x.lineWidth=12;rr(x,40,40,W-80,H-80,56);x.stroke();
+  x.textAlign="center";x.textBaseline="alphabetic";
+  x.font=`80px ${D}`;const bw=x.measureText("두근").width;
+  x.fillStyle="#e8436a";heartPath(x,W/2-bw/2-30,148,30);x.fillText("두근",W/2+20,178);
+  x.font=`bold 40px ${B}`;const cw=x.measureText(c.chip).width+64;
+  x.fillStyle="#fde3ea";rr(x,(W-cw)/2,220,cw,70,35);x.fill();x.fillStyle="#c42a52";x.fillText(c.chip,W/2,269);
+  let y=390;
+  x.fillStyle="#2b1d22";x.font=`66px ${D}`;
+  for(const l of wrapText(x,c.who,W-200)){x.fillText(l,W/2,y);y+=80}
+  if(c.big){x.fillStyle="#e8436a";x.font=`200px ${D}`;y+=170;x.fillText(c.big,W/2,y);y+=50}
+  x.fillStyle="#2b1d22";x.font=`52px ${D}`;y+=40;
+  for(const l of wrapText(x,c.msg,W-220)){x.fillText(l,W/2,y);y+=68}
+  x.fillStyle="#85737a";x.font=`${c.small?32:40}px ${B}`;y+=16;
+  for(const line of c.lines||[]){for(const l of wrapText(x,line,W-240)){if(y>H-210)break;x.fillText(l,W/2,y);y+=c.small?46:56}}
+  x.fillStyle="#c42a52";x.font=`bold 38px ${B}`;x.fillText("두근에서 나도 해 보기",W/2,H-140);
+  x.fillStyle="#85737a";x.font=`30px ${B}`;x.fillText("재미로 보는 결과예요",W/2,H-92);
+  return new Promise(r=>cv.toBlob(b=>r(b),"image/png"));
+}
+function checkCard(){
+  const on=[...document.querySelectorAll("#check input")].map((i,k)=>i.checked?SIGNALS[k]:null).filter(Boolean);
+  const v=$("#verdict").textContent;
+  return{chip:"썸 신호 체크",who:"그 사람도 나를 좋아할까?",big:`${on.length}/8`,msg:v,small:true,lines:on.length?on:["아직 체크한 신호가 없어요"],text:`[두근] 썸 신호 체크 결과 8개 중 ${on.length}개! "${v}"`};
+}
+async function openShare(kind){
+  if(kind==="check")LAST.check=checkCard();
+  const c=LAST[kind];if(!c)return;
+  $("#sheet-ok").textContent="";
+  shareBlob=await drawCard(c);shareText=c.text+"\n나도 해 보기: "+SHARE_URL;
+  if(shareUrlObj)URL.revokeObjectURL(shareUrlObj);
+  shareUrlObj=URL.createObjectURL(shareBlob);$("#sheet-img").src=shareUrlObj;
+  let can=false;
+  try{can=!!(navigator.canShare&&navigator.canShare({files:[new File([shareBlob],"dugeun-result.png",{type:"image/png"})]}))}catch(e){}
+  $("#sheet-share").hidden=!can;
+  $("#sheet").hidden=false;document.body.style.overflow="hidden";
+}
+function closeShare(){$("#sheet").hidden=true;document.body.style.overflow=""}
+async function sheetAction(a){
+  const ok=$("#sheet-ok");
+  if(a==="close"){closeShare();return}
+  if(a==="share"){
+    try{await navigator.share({files:[new File([shareBlob],"dugeun-result.png",{type:"image/png"})],text:shareText,title:"두근"});ok.textContent="보냈어요!"}
+    catch(e){if(e&&e.name==="AbortError")return;ok.textContent="여기서는 바로 보내기가 안 돼요. 이미지를 저장해서 올려 주세요."}
+    return;
+  }
+  if(a==="save"){
+    try{
+      const dl=(window.claude&&typeof window.claude.use==="function")?await window.claude.use("downloads"):null;
+      if(dl){await dl.save({filename:"dugeun-result.png",data:shareBlob});ok.textContent="이미지를 저장했어요.";return}
+    }catch(e){if(e&&e.code){ok.textContent="저장하지 않았어요. 이미지를 길게 눌러 저장해도 돼요.";return}}
+    const l=document.createElement("a");l.href=shareUrlObj;l.download="dugeun-result.png";document.body.appendChild(l);l.click();l.remove();
+    ok.textContent="저장이 안 되면 이미지를 길게 눌러 저장해 주세요.";return;
+  }
+  if(a==="copy"){
+    try{await navigator.clipboard.writeText(shareText);ok.textContent="문구와 링크를 복사했어요. 카톡이나 인스타에 붙여 넣으세요."}
+    catch(e){
+      const t=document.createElement("textarea");t.value=shareText;t.setAttribute("readonly","");t.style.position="fixed";t.style.opacity="0";document.body.appendChild(t);t.select();
+      let done=false;try{done=document.execCommand("copy")}catch(_){}
+      t.remove();ok.textContent=done?"문구와 링크를 복사했어요.":"복사가 안 됐어요. 이 문구를 직접 옮겨 주세요: "+shareText;
+    }
+  }
+}
+$("#sheet").addEventListener("click",e=>{if(e.target===$("#sheet"))closeShare()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#sheet").hidden)closeShare()});
 
 /* ---------- 상담 ---------- */
 const GUIDE=`너는 연애 앱 '두근'의 연애 상담사야. 이 앱은 연애를 시작하고 싶거나 짝사랑 중인 사람이 써.
