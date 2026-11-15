@@ -778,11 +778,11 @@ async function drawCard(c){
   let y=390;
   x.fillStyle="#2b1d22";x.font=`66px ${D}`;
   for(const l of wrapText(x,c.who,W-200)){x.fillText(l,W/2,y);y+=80}
-  if(c.big){x.fillStyle="#e8436a";x.font=`200px ${D}`;y+=170;x.fillText(c.big,W/2,y);y+=50}
+  if(c.big){x.fillStyle="#e8436a";x.font=`${c.small?150:200}px ${D}`;y+=c.small?130:170;x.fillText(c.big,W/2,y);y+=c.small?30:50}
   x.fillStyle="#2b1d22";x.font=`52px ${D}`;y+=40;
   for(const l of wrapText(x,c.msg,W-220)){x.fillText(l,W/2,y);y+=68}
   x.fillStyle="#85737a";x.font=`${c.small?32:40}px ${B}`;y+=16;
-  for(const line of c.lines||[]){for(const l of wrapText(x,line,W-240)){if(y>H-210)break;x.fillText(l,W/2,y);y+=c.small?46:56}}
+  for(const line of c.lines||[]){for(const l of wrapText(x,line,W-240)){if(y>H-210)break;x.fillText(l,W/2,y);y+=c.small?44:56}}
   x.fillStyle="#c42a52";x.font=`bold 38px ${B}`;x.fillText("두근에서 나도 해 보기",W/2,H-140);
   x.fillStyle="#85737a";x.font=`30px ${B}`;x.fillText("재미로 보는 결과예요",W/2,H-92);
   return new Promise(r=>cv.toBlob(b=>r(b),"image/png"));
