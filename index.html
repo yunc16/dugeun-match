@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>두근</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: 상단 고정 헤더(로고 + 빨간빛 핑크 탭 버튼 3개), 아래는 최대 720px 단일 컬럼 */
+:root{
+  --bg:#ffffff;
+  --ink:#2b1d22;
+  --muted:#85737a;
+  --line:#f1e2e6;
+  --blush:#fff4f6;
+  --pink:#e8436a;
+  --pink-deep:#c42a52;
+  --pink-soft:#fde3ea;
+  --on-pink:#ffffff;
+  --ok:#1d7f55;
+  --ok-soft:#e3f4ec;
+  --font-display:"Jua","Noto Sans KR",system-ui,sans-serif;
+  --font-body:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:light;
+}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--font-body);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{text-wrap:balance;margin:0}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+
+/* header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.brand-row{display:flex;align-items:center;gap:10px;padding-block:14px 10px}
+.brand{font-family:var(--font-display);font-size:30px;line-height:1;color:var(--pink);display:flex;align-items:center;gap:6px}
+.brand svg{width:26px;height:26px}
+.brand-sub{color:var(--muted);font-size:13px}
+nav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding-block:0 12px}
+.tab{display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;border-radius:14px;background:var(--pink);color:var(--on-pink);font-weight:700;font-size:15px;padding:12px 6px;box-shadow:0 3px 0 var(--pink-deep);transition:transform .12s,box-shadow .12s,background .12s}
+.tab svg{width:18px;height:18px;flex:none}
+.tab:hover{background:#ef5479}
+.tab[aria-current="page"]{background:var(--pink-deep);box-shadow:0 0 0 var(--pink-deep);transform:translateY(3px)}
+
+main{padding-block:20px 40px}
+section.view{display:grid;gap:18px}
+.eyebrow{font-size:12px;letter-spacing:.06em;color:var(--pink-deep);font-weight:700}
+.h2{font-family:var(--font-display);font-size:24px;font-weight:400;line-height:1.3}
+.lead{color:var(--muted);font-size:14px}
+
+.banner{display:flex;gap:10px;align-items:flex-start;background:var(--blush);border:1px solid var(--pink-soft);border-radius:14px;padding:12px 14px;font-size:13.5px;color:var(--ink)}
+.banner .dot{width:8px;height:8px;border-radius:50%;background:var(--pink);margin-top:7px;flex:none}
+.banner.live .dot{background:var(--ok)}
+
+.btn{appearance:none;border:0;border-radius:12px;background:var(--pink);color:var(--on-pink);font-weight:700;padding:11px 16px;cursor:pointer;box-shadow:0 2px 0 var(--pink-deep)}
+.btn:hover{background:#ef5479}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:var(--bg);color:var(--pink-deep);border:1.5px solid var(--pink);box-shadow:none}
+.btn.ghost:hover{background:var(--blush)}
+.btn.small{padding:8px 12px;font-size:13.5px}
+
+/* filter */
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.fchip{appearance:none;border:1.5px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 14px;font-size:13.5px;cursor:pointer;color:var(--ink)}
+.fchip[aria-pressed="true"]{border-color:var(--pink);background:var(--pink-soft);color:var(--pink-deep);font-weight:700}
+.liked-me{margin-left:auto;font-size:13px;color:var(--muted)}
+.liked-me b{color:var(--pink-deep)}
+
+/* cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.card{border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:12px;background:var(--bg);min-width:0}
+.card.matched{border-color:var(--pink);box-shadow:0 0 0 3px var(--pink-soft)}
+.card-top{display:flex;gap:12px;align-items:center}
+.avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-display);font-size:21px;color:var(--ink);flex:none}
+.who{min-width:0;flex:1}
+.who h3{font-size:16.5px;font-weight:700;overflow-wrap:anywhere}
+.who h3 .age{font-weight:500;color:var(--muted);font-size:14px;margin-left:4px}
+.meta{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.status{font-size:12px;border-radius:999px;padding:1px 8px;font-weight:700}
+.status.single{background:var(--pink-soft);color:var(--pink-deep)}
+.status.crush{background:#fff0d9;color:#9a5800}
+.score{text-align:center;flex:none}
+.score b{display:block;font-family:var(--font-display);font-weight:400;font-size:24px;color:var(--pink);line-height:1;font-variant-numeric:tabular-nums}
+.score span{font-size:11px;color:var(--muted)}
+.bio{font-size:14px;overflow-wrap:anywhere}
+.tags{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0}
+.tag{font-size:12.5px;border:1px solid var(--line);border-radius:999px;padding:2px 10px;color:var(--muted)}
+.tag.shared{border-color:var(--pink);color:var(--pink-deep);background:var(--blush);font-weight:700}
+.card-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.like{display:inline-flex;align-items:center;gap:6px;appearance:none;border:1.5px solid var(--pink);background:var(--bg);color:var(--pink-deep);border-radius:999px;padding:7px 14px;font-weight:700;font-size:14px;cursor:pointer}
+.like svg{width:16px;height:16px}
+.like[aria-pressed="true"]{background:var(--pink);color:var(--on-pink)}
+.like:disabled{opacity:.45;cursor:not-allowed}
+.badge-ex{font-size:11.5px;color:var(--muted);border:1px dashed var(--muted);border-radius:6px;padding:0 6px}
+.badge-match{font-size:12.5px;font-weight:700;color:var(--ok);background:var(--ok-soft);border-radius:999px;padding:3px 10px}
+.spacer{flex:1}
+
+.panel{border:1px solid var(--line);border-radius:18px;padding:18px;display:grid;gap:12px}
+.panel.pink{background:var(--blush);border-color:var(--pink-soft)}
+.empty{text-align:center;color:var(--muted);padding:28px 16px;border:1.5px dashed var(--line);border-radius:18px;display:grid;gap:10px;justify-items:center}
+.matches{display:grid;gap:10px}
+.match-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg);border:1px solid var(--pink-soft);border-radius:14px;padding:10px 12px}
+.match-row .who{min-width:120px}
+
+/* form */
+form{display:grid;gap:18px}
+.field{display:grid;gap:8px;min-width:0}
+.field>label,.field>.lbl{font-weight:700;font-size:14px}
+.hint{font-size:12.5px;color:var(--muted);font-weight:400}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+input[type=text],input[type=number],select,textarea{width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg)}
+input:focus,select:focus,textarea:focus{border-color:var(--pink);outline:none;box-shadow:0 0 0 3px var(--pink-soft)}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg label{flex:1;min-width:120px}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:block;text-align:center;border:1.5px solid var(--line);border-radius:12px;padding:10px;cursor:pointer;font-weight:500}
+.seg input:checked+span{border-color:var(--pink);background:var(--pink-soft);color:var(--pink-deep);font-weight:700}
+.seg input:focus-visible+span{outline:3px solid var(--pink);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips label{position:relative}
+.chips input{position:absolute;opacity:0;pointer-events:none}
+.chips span{display:inline-block;border:1.5px solid var(--line);border-radius:999px;padding:6px 13px;font-size:13.5px;cursor:pointer}
+.chips input:checked+span{border-color:var(--pink);background:var(--pink);color:var(--on-pink);font-weight:700}
+.chips input:focus-visible+span{outline:3px solid var(--pink);outline-offset:2px}
+.form-err{color:var(--pink-deep);font-size:13.5px;font-weight:700;min-height:1em}
+.form-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* counsel */
+.topics{display:flex;flex-wrap:wrap;gap:8px}
+.chat{border:1px solid var(--line);border-radius:18px;display:grid;grid-template-rows:auto auto;overflow:hidden}
+.log{max-height:min(52vh,460px);min-height:220px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.msg{max-width:86%;padding:10px 14px;border-radius:16px;font-size:14.5px;overflow-wrap:anywhere;white-space:normal}
+.msg.user{align-self:flex-end;background:var(--pink);color:var(--on-pink);border-bottom-right-radius:4px}
+.msg.assistant{align-self:flex-start;background:var(--blush);border:1px solid var(--pink-soft);border-bottom-left-radius:4px}
+.msg .who-lbl{display:block;font-size:11.5px;font-weight:700;color:var(--pink-deep);margin-bottom:2px}
+.msg.typing{color:var(--muted)}
+.composer{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line);background:var(--bg);align-items:flex-end}
+.composer textarea{resize:none;min-height:44px;max-height:140px}
+.composer .btn{flex:none;height:44px}
+
+.check{display:grid;gap:8px}
+.check label{display:flex;gap:10px;align-items:flex-start;font-size:14px;cursor:pointer}
+.check input{accent-color:var(--pink);width:18px;height:18px;margin-top:3px;flex:none}
+.meter{height:12px;border-radius:999px;background:var(--pink-soft);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--pink);border-radius:999px;transition:width .3s}
+.verdict{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.verdict b{font-family:var(--font-display);font-weight:400;font-size:20px;color:var(--pink-deep)}
+.verdict span{font-size:13px;color:var(--muted)}
+
+/* mini game */
+.game{display:grid;gap:18px}
+.q-card{border:1px solid var(--line);border-radius:22px;padding:20px;display:grid;gap:18px}
+.q-top{display:flex;align-items:center;gap:12px}
+.q-num{font-family:var(--font-display);font-size:18px;color:var(--pink-deep);font-variant-numeric:tabular-nums;flex:none}
+.q-bar{flex:1;height:8px;border-radius:999px;background:var(--pink-soft);overflow:hidden}
+.q-bar i{display:block;height:100%;background:var(--pink);border-radius:999px;transition:width .25s}
+.q-kicker{font-size:12.5px;font-weight:700;color:var(--muted);letter-spacing:.04em}
+.q-title{font-family:var(--font-display);font-weight:400;font-size:26px;line-height:1.3}
+.q-opts{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:stretch}
+.opt{appearance:none;border:2px solid var(--pink);background:var(--bg);color:var(--ink);border-radius:18px;padding:22px 14px;font-weight:700;font-size:16px;cursor:pointer;display:grid;gap:8px;justify-items:center;align-content:center;text-align:center;min-height:120px;transition:background .12s,transform .12s}
+.opt:hover{background:var(--blush)}
+.opt.picked{background:var(--pink);color:var(--on-pink);transform:scale(.98)}
+.opt-k{font-family:var(--font-display);font-weight:400;font-size:22px;color:var(--pink)}
+.opt.picked .opt-k{color:var(--on-pink)}
+.vs{align-self:center;justify-self:center;font-family:var(--font-display);font-size:20px;color:var(--pink-deep)}
+.textbtn{appearance:none;border:0;background:none;color:var(--muted);font-size:13.5px;cursor:pointer;justify-self:start;padding:4px 0;text-decoration:underline}
+.score b small{font-size:13px;color:var(--muted);font-family:var(--font-body)}
+.dots{display:inline-flex;gap:4px}
+.dots i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--pink)}
+.bal-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bal-lbl{font-size:14px;color:var(--pink-deep)}
+.bal-same{font-size:13px;color:var(--muted)}
+.bal-badge{font-size:12.5px;font-weight:700;color:var(--pink-deep);background:var(--blush);border:1px solid var(--pink-soft);border-radius:999px;padding:2px 10px}
+details.panel summary{cursor:pointer;font-weight:700}
+.my-ans{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:14px}
+.my-ans li{display:flex;gap:10px}
+.my-ans span{flex:none;width:84px;color:var(--muted);font-size:13px}
+
+footer{border-top:1px solid var(--line);padding-block:18px 28px;color:var(--muted);font-size:12.5px}
+footer ul{margin:6px 0 0;padding-left:18px;display:grid;gap:2px}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:20;max-width:calc(100% - 40px);text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (max-width:520px){
+  .row2{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr}
+  .tab{font-size:14px;padding:11px 4px}
+  .liked-me{margin-left:0;width:100%}
+  .q-opts{grid-template-columns:1fr}
+  .q-title{font-size:22px}
+  .opt{min-height:88px}
+}
+@media (max-width:440px){
+  .tab svg{display:none}
+  .tab{font-size:13.5px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-heart" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-7.5-4.6-9.6-9.3C.9 8.3 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.2.3.6.3.8 0 .7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.8 4.3 7.2C19.5 16.4 12 21 12 21z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></symbol>
+  <symbol id="i-game" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M7 7h10a5 5 0 0 1 4.9 6l-.8 4a2.6 2.6 0 0 1-4.5 1.2L14.4 16H9.6l-2.2 2.2A2.6 2.6 0 0 1 2.9 17l-.8-4A5 5 0 0 1 7 7zm0 3v1.5H5.5V13H7v1.5h1.5V13H10v-1.5H8.5V10zm8.5.2a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm2 2a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.2" fill="currentColor"/><path fill="currentColor" d="M3.5 21c.6-4.4 4.2-7 8.5-7s7.9 2.6 8.5 7z"/></symbol>
+</svg>
+
+<header>
+  <div class="wrap">
+    <div class="brand-row">
+      <div class="brand"><svg aria-hidden="true"><use href="#i-heart"/></svg>두근</div>
+      <div class="brand-sub">연애하고 싶은 사람, 짝사랑 중인 사람을 위한 앱</div>
+    </div>
+    <nav aria-label="메뉴">
+      <a class="tab" href="#match" data-view="match"><svg aria-hidden="true"><use href="#i-heart"/></svg>매칭</a>
+      <a class="tab" href="#game" data-view="game"><svg aria-hidden="true"><use href="#i-game"/></svg>미니 게임</a>
+      <a class="tab" href="#counsel" data-view="counsel"><svg aria-hidden="true"><use href="#i-chat"/></svg>고민 상담</a>
+      <a class="tab" href="#profile" data-view="profile"><svg aria-hidden="true"><use href="#i-user"/></svg>내 프로필</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- 매칭 -->
+  <section class="view" id="view-match" aria-labelledby="t-match">
+    <div>
+      <p class="eyebrow">MATCH</p>
+      <h1 class="h2" id="t-match">서로 좋아요를 누르면 매칭돼요</h1>
+      <p class="lead">관심사가 겹칠수록 궁합 점수가 높아져요. 겹치는 관심사는 핑크색으로 보여요.</p>
+    </div>
+    <div class="banner" id="mode-banner"><span class="dot"></span><span id="mode-text">회원 목록을 불러오는 중이에요.</span></div>
+    <div id="need-profile" class="panel pink" hidden>
+      <strong>먼저 내 프로필을 만들어 주세요</strong>
+      <p class="lead">성별을 알려주시면 이성 회원만 골라서 보여드리고, 좋아요를 보낼 수 있어요.</p>
+      <div><a class="btn" href="#profile" style="text-decoration:none;display:inline-block">프로필 만들기</a></div>
+    </div>
+    <div id="match-box" class="panel pink" hidden>
+      <strong id="match-title">매칭된 사람</strong>
+      <div class="matches" id="match-list"></div>
+    </div>
+    <div class="filters" role="group" aria-label="상대 상태로 거르기">
+      <button class="fchip" type="button" data-f="all" aria-pressed="true">전체</button>
+      <button class="fchip" type="button" data-f="single" aria-pressed="false">연애하고 싶어요</button>
+      <button class="fchip" type="button" data-f="crush" aria-pressed="false">짝사랑 중이에요</button>
+      <span class="liked-me" id="liked-me"></span>
+    </div>
+    <div class="grid" id="cards"></div>
+  </section>
+
+  <!-- 미니 게임 -->
+  <section class="view" id="view-game" aria-labelledby="t-game" hidden>
+    <div>
+      <p class="eyebrow">GAME</p>
+      <h1 class="h2" id="t-game">밸런스 게임으로 취향 맞는 이성 찾기</h1>
+      <p class="lead">둘 중 하나만 고르면 돼요. 10문제, 1분이면 끝나요. 같은 답을 많이 고른 이성일수록 위에 보여요.</p>
+    </div>
+    <div class="game" id="game"></div>
+  </section>
+
+  <!-- 고민 상담 -->
+  <section class="view" id="view-counsel" aria-labelledby="t-counsel" hidden>
+    <div>
+      <p class="eyebrow">TALK</p>
+      <h1 class="h2" id="t-counsel">연애 고민, 편하게 털어놓으세요</h1>
+      <p class="lead">고백 타이밍, 썸 판별, 연락 고민까지. 상담 내용은 다른 회원에게 보이지 않아요.</p>
+    </div>
+    <div class="topics" role="group" aria-label="자주 묻는 고민">
+      <button class="fchip" type="button" data-q="짝사랑하는 사람에게 고백하고 싶은데, 언제 어떻게 하면 좋을까요?">고백 타이밍</button>
+      <button class="fchip" type="button" data-q="요즘 연락하는 사람이 있는데 이게 썸인지 그냥 친한 건지 모르겠어요.">썸인지 헷갈려요</button>
+      <button class="fchip" type="button" data-q="상대가 답장이 느려요. 연락을 얼마나 자주 해야 부담스럽지 않을까요?">연락 빈도</button>
+      <button class="fchip" type="button" data-q="첫 데이트 장소와 대화 주제를 추천해 주세요.">첫 데이트</button>
+      <button class="fchip" type="button" data-q="고백했는데 거절당했어요. 마음을 어떻게 정리하면 좋을까요?">거절 후 마음 정리</button>
+    </div>
+    <div class="chat">
+      <div class="log" id="log" aria-live="polite"></div>
+      <form class="composer" id="composer">
+        <label for="q" class="sr" style="position:absolute;left:-9999px">고민 입력</label>
+        <textarea id="q" rows="1" maxlength="1000" placeholder="고민을 적어 주세요 (Enter 보내기, Shift+Enter 줄바꿈)"></textarea>
+        <button class="btn" type="submit" id="send">보내기</button>
+      </form>
+    </div>
+
+    <div class="panel">
+      <div>
+        <strong>그 사람도 나를 좋아할까? 썸 신호 체크</strong>
+        <p class="lead">최근 2주 동안 있었던 일에 체크해 보세요.</p>
+      </div>
+      <div class="check" id="check"></div>
+      <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+      <div class="verdict"><b id="verdict">아직 체크 전이에요</b><span id="verdict-sub">0 / 8</span></div>
+    </div>
+  </section>
+
+  <!-- 내 프로필 -->
+  <section class="view" id="view-profile" aria-labelledby="t-profile" hidden>
+    <div>
+      <p class="eyebrow">PROFILE</p>
+      <h1 class="h2" id="t-profile">나를 소개해 주세요</h1>
+      <p class="lead" id="profile-lead">연락처나 실명은 적지 마세요. 매칭된 뒤 천천히 알려줘도 늦지 않아요.</p>
+    </div>
+    <form id="pform" class="panel" novalidate>
+      <div class="field">
+        <span class="lbl">성별</span>
+        <div class="seg">
+          <label><input type="radio" name="gender" id="g-f" value="f"><span>여자</span></label>
+          <label><input type="radio" name="gender" id="g-m" value="m"><span>남자</span></label>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="nickname">닉네임 <span class="hint">2~10자</span></label>
+          <input type="text" id="nickname" maxlength="10" placeholder="예: 봄날의라떼" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="age">나이 <span class="hint">만 19세 이상</span></label>
+          <input type="number" id="age" min="19" max="60" inputmode="numeric" placeholder="27">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="region">지역</label>
+          <select id="region"></select>
+        </div>
+        <div class="field">
+          <span class="lbl">지금 내 상태</span>
+          <div class="seg">
+            <label><input type="radio" name="status" id="s-single" value="single"><span>연애하고 싶어요</span></label>
+            <label><input type="radio" name="status" id="s-crush" value="crush"><span>짝사랑 중이에요</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <span class="lbl">관심사 <span class="hint">1~5개</span></span>
+        <div class="chips" id="interests"></div>
+      </div>
+      <div class="field">
+        <label for="bio">한 줄 소개 <span class="hint" id="bio-count">0 / 60</span></label>
+        <input type="text" id="bio" maxlength="60" placeholder="예: 주말엔 동네 카페 투어해요" autocomplete="off">
+      </div>
+      <p class="form-err" id="form-err" role="alert"></p>
+      <div class="form-actions">
+        <button class="btn" type="submit" id="save">프로필 저장</button>
+        <span class="spacer"></span>
+        <span id="del-area"></span>
+      </div>
+    </form>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <strong>안전하게 만나요</strong>
+    <ul>
+      <li>처음 만날 때는 사람이 많은 공개된 장소에서 만나요.</li>
+      <li>돈을 빌려달라거나 투자를 권하면 바로 대화를 멈추세요.</li>
+      <li>마음이 많이 힘들면 정신건강 위기상담 전화 109에서 언제든 이야기할 수 있어요.</li>
+    </ul>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+"use strict";
+const INTERESTS=["카페","영화","운동","여행","맛집","음악","독서","게임","전시","반려동물","요리","드라이브","캠핑","사진"];
+const REGIONS=["서울","경기","인천","부산","대구","광주","대전","울산","세종","강원","충북","충남","전북","전남","경북","경남","제주"];
+const STATUS={single:"연애하고 싶어요",crush:"짝사랑 중이에요"};
+const AV=["#fde3ea","#ffe9d6","#e6f0ff","#e6f6ec","#f1e8ff","#fff3c4"];
+// 체험용 예시 프로필 (실제 회원이 아님)
+const SAMPLES=[
+ {id:"ex-w1",gender:"f",nickname:"봄날의라떼",age:27,region:"서울",status:"single",interests:["카페","전시","사진"],bio:"주말엔 동네 카페 투어해요. 같이 사진 찍어줄 사람!",likesYou:true},
+ {id:"ex-w2",gender:"f",nickname:"달리는민지",age:29,region:"경기",status:"single",interests:["운동","맛집","여행"],bio:"러닝 크루 3년차, 뛰고 나서 먹는 국밥이 최고예요",likesYou:false},
+ {id:"ex-w3",gender:"f",nickname:"책갈피",age:25,region:"부산",status:"crush",interests:["독서","영화","음악"],bio:"짝사랑은 이제 졸업하고 싶어요. 대화 잘 통하는 사람 좋아요",likesYou:true},
+ {id:"ex-w4",gender:"f",nickname:"고양이집사",age:31,region:"서울",status:"single",interests:["반려동물","요리","드라이브"],bio:"고양이 두 마리랑 살아요. 집밥 잘해요",likesYou:false},
+ {id:"ex-m1",gender:"m",nickname:"캠핑가는곰",age:30,region:"경기",status:"single",interests:["캠핑","요리","드라이브"],bio:"불멍하면서 이야기 나누는 시간을 좋아해요",likesYou:true},
+ {id:"ex-m2",gender:"m",nickname:"퇴근후기타",age:28,region:"서울",status:"crush",interests:["음악","카페","영화"],bio:"기타 치는 회사원이에요. 노래 추천 주고받아요",likesYou:false},
+ {id:"ex-m3",gender:"m",nickname:"빵지순례",age:26,region:"대전",status:"single",interests:["맛집","여행","사진"],bio:"대전 빵집이라면 어디든 안내할 수 있어요",likesYou:true},
+ {id:"ex-m4",gender:"m",nickname:"주말등산러",age:32,region:"부산",status:"single",interests:["운동","여행","독서"],bio:"아침엔 산에 오르고 오후엔 책 읽어요",likesYou:false}
+];
+const BALANCE=[
+ {k:"연락",q:"연락 스타일은?",a:"하루 종일 자주 카톡",b:"저녁에 한 번 긴 통화"},
+ {k:"데이트",q:"오늘 데이트는?",a:"집에서 영화 보기",b:"밖에서 맛집 탐방"},
+ {k:"여행",q:"둘이 여행 간다면?",a:"계획을 꼼꼼히 짠다",b:"발길 닿는 대로 간다"},
+ {k:"다툼",q:"싸웠을 때 나는?",a:"바로 대화로 푼다",b:"하루쯤 생각할 시간을 갖는다"},
+ {k:"기념일",q:"기념일에는?",a:"깜짝 이벤트",b:"같이 고른 선물"},
+ {k:"주말",q:"주말 시작은?",a:"아침 일찍 부지런하게",b:"늦잠 자고 오후부터"},
+ {k:"애정 표현",q:"애정 표현은?",a:"말로 자주 표현한다",b:"행동으로 챙겨준다"},
+ {k:"데이트 비용",q:"데이트 비용은?",a:"번갈아 가며 낸다",b:"데이트 통장을 만든다"},
+ {k:"깻잎 논쟁",q:"내 연인이 친구의 깻잎을 떼어준다면?",a:"그 정도는 괜찮다",b:"솔직히 좀 서운하다"},
+ {k:"첫 만남",q:"첫 만남 장소는?",a:"조용한 카페에서 대화",b:"전시나 방탈출처럼 같이 뭔가 하기"}
+];
+// 예시 프로필의 밸런스 게임 답 (0=A, 1=B). ex-w4는 아직 게임을 안 한 회원 예시
+const SAMPLE_BAL={"ex-w1":[1,1,0,0,1,1,0,1,0,0],"ex-w2":[0,1,0,0,0,0,1,0,1,1],"ex-w3":[1,0,1,1,0,1,0,1,1,0],"ex-m1":[1,0,1,0,0,0,1,1,0,1],"ex-m2":[1,0,1,1,1,1,0,0,1,0],"ex-m3":[0,1,1,0,1,0,0,0,0,1],"ex-m4":[0,1,0,0,0,0,1,1,1,1]};
+const SIGNALS=["나에게 먼저 연락이 오는 편이다","답장이 빠르고 질문으로 대화를 이어간다","내가 지나가듯 한 말을 기억하고 있다","둘이 만나자는 말에 흔쾌히 응한다","내 연애 상황이나 이상형을 물어본 적이 있다","다른 이성 이야기를 하면 반응이 달라진다","눈이 자주 마주치고 잘 웃어준다","다음 약속을 상대가 먼저 잡는다"];
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const LS={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+const S={mode:"loading",profiles:[],me:null,myId:"me",filter:"all",stale:false,chat:[],busy:false,formDirty:false,confirmDel:false,game:{step:-1,answers:[]}};
+let db=null,myRef=null,writeChain=Promise.resolve();
+
+/* ---------- 공통 ---------- */
+let toastT;
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("on"),2600)}
+function hashColor(s){let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))>>>0;return AV[h%AV.length]}
+function norm(p){return{id:p.id,gender:p.gender==="m"?"m":"f",nickname:String(p.nickname||"이름 없음").slice(0,10),age:Number(p.age)||0,region:String(p.region||""),status:p.status==="crush"?"crush":"single",interests:Array.isArray(p.interests)?p.interests.filter(i=>INTERESTS.includes(i)).slice(0,5):[],bio:String(p.bio||"").slice(0,60),likes:Array.isArray(p.likes)?p.likes.map(String).slice(0,500):[],likesYou:!!p.likesYou,example:!!p.example,balance:validBal(p.balance)}}
+
+/* ---------- 라우팅 ---------- */
+const VIEWS=["match","game","counsel","profile"];
+function route(){
+  const v=VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):"match";
+  VIEWS.forEach(n=>{$("#view-"+n).hidden=n!==v});
+  document.querySelectorAll(".tab").forEach(a=>{a.toggleAttribute("aria-current",a.dataset.view===v);if(a.dataset.view===v)a.setAttribute("aria-current","page")});
+  if(v==="profile"&&!S.formDirty)fillForm();
+  if(v==="counsel")scrollLog();
+  if(v==="game")renderGame();
+}
+window.addEventListener("hashchange",()=>{route();window.scrollTo(0,0)});
+
+/* ---------- 매칭 ---------- */
+function others(){
+  const list=S.profiles.filter(p=>p.id!==S.myId);
+  return S.me?list.filter(p=>p.gender!==S.me.gender):list;
+}
+function likedMe(p){return S.mode==="live"?p.likes.includes(S.myId):p.likesYou}
+function iLike(p){return !!S.me&&S.me.likes.includes(p.id)}
+function isMatch(p){return iLike(p)&&likedMe(p)}
+function score(p){
+  if(!S.me)return null;
+  const shared=p.interests.filter(i=>S.me.interests.includes(i)).length;
+  let s=45+Math.min(shared,3)*12;
+  if(p.region&&p.region===S.me.region)s+=12;
+  const gap=Math.abs(p.age-S.me.age);s+=gap<=3?7:gap<=6?3:0;
+  return Math.min(s,99);
+}
+function avatar(p){return `<div class="avatar" style="background:${hashColor(p.id)}" aria-hidden="true">${esc(p.nickname.slice(0,1))}</div>`}
+
+function renderMatch(){
+  if(!$("#view-game").hidden)renderGame();
+  // 모드 안내
+  const b=$("#mode-banner"),t=$("#mode-text");
+  b.classList.toggle("live",S.mode==="live");
+  if(S.mode==="loading")t.textContent="실제 회원을 불러오는 중이에요. 그동안 예시 프로필로 둘러보세요.";
+  else if(S.mode==="demo")t.textContent="체험 모드예요. 지금 보이는 프로필은 앱을 체험할 수 있게 만든 예시이고, 내 프로필과 좋아요는 이 기기에만 저장돼요.";
+  else{
+    const n=S.profiles.length;
+    t.textContent=S.stale?"회원 목록을 아직 불러오지 못했어요. 인터넷 연결을 확인해 주세요. 보이는 내용이 최신이 아닐 수 있어요.":`지금 ${n}명이 두근에 프로필을 올렸어요.`;
+  }
+  $("#need-profile").hidden=!!S.me;
+
+  const list=others();
+  // 매칭된 사람
+  const matched=list.filter(isMatch);
+  $("#match-box").hidden=!matched.length;
+  $("#match-title").textContent=`서로 좋아요! 매칭된 사람 ${matched.length}명`;
+  $("#match-list").innerHTML=matched.map(p=>`
+    <div class="match-row">${avatar(p)}
+      <div class="who"><h3>${esc(p.nickname)}<span class="age">${p.age||""}</span></h3><p class="meta">${esc(p.region)} · ${esc(p.interests.join(", "))}</p></div>
+      <span class="spacer"></span>
+      <button class="btn small" type="button" data-first="${esc(p.id)}">첫 메시지 추천받기</button>
+    </div>`).join("");
+
+  // 나를 좋아한 사람 수
+  const lm=S.me?list.filter(p=>likedMe(p)&&!iLike(p)).length:0;
+  $("#liked-me").innerHTML=S.me&&lm?`나를 먼저 좋아한 사람 <b>${lm}명</b>이 숨어 있어요`:"";
+
+  // 카드
+  const shown=list.filter(p=>S.filter==="all"||p.status===S.filter).map(p=>({p,s:score(p)})).sort((a,b)=>(b.s??0)-(a.s??0));
+  const box=$("#cards");
+  if(!shown.length){
+    let msg;
+    if(S.mode==="live"&&!list.length)msg=`<strong>아직 매칭할 수 있는 회원이 없어요</strong><span>이 페이지 링크를 친구에게 공유하면 프로필이 하나둘 쌓여요.</span>`;
+    else msg=`<strong>조건에 맞는 사람이 없어요</strong><span>다른 상태를 골라 보세요.</span>`;
+    box.innerHTML=`<div class="empty" style="grid-column:1/-1">${msg}</div>`;return;
+  }
+  const mb=myBalance();
+  box.innerHTML=shown.map(({p,s})=>{
+    const m=isMatch(p);
+    const tags=p.interests.map(i=>`<li class="tag${S.me&&S.me.interests.includes(i)?" shared":""}">${esc(i)}</li>`).join("");
+    return `<article class="card${m?" matched":""}">
+      <div class="card-top">${avatar(p)}
+        <div class="who"><h3>${esc(p.nickname)}<span class="age">${p.age||""}</span></h3>
+          <p class="meta">${esc(p.region)}<span class="status ${p.status}">${STATUS[p.status]}</span></p></div>
+        ${s!=null?`<div class="score"><b>${s}</b><span>궁합</span></div>`:""}
+      </div>
+      ${p.bio?`<p class="bio">${esc(p.bio)}</p>`:""}
+      ${tags?`<ul class="tags">${tags}</ul>`:""}
+      <div class="card-actions">
+        ${likeBtn(p)}
+        ${m?`<span class="badge-match">매칭 성공</span>`:""}
+        ${mb&&p.balance?`<span class="bal-badge">밸런스 ${same(mb,p.balance)}/${BALANCE.length}</span>`:""}
+        <span class="spacer"></span>
+        ${p.example?`<span class="badge-ex">예시 프로필</span>`:""}
+      </div>
+    </article>`;
+  }).join("");
+}
+
+document.addEventListener("click",e=>{
+  const f=e.target.closest("[data-f]");
+  if(f){S.filter=f.dataset.f;document.querySelectorAll("[data-f]").forEach(x=>x.setAttribute("aria-pressed",x===f));renderMatch();return}
+  const l=e.target.closest("[data-like]");
+  if(l&&S.me){toggleLike(l.dataset.like);return}
+  const fm=e.target.closest("[data-first]");
+  if(fm){const p=S.profiles.find(x=>x.id===fm.dataset.first);if(p){
+    const mb=myBalance();
+    const bal=mb&&p.balance?` 밸런스 게임에서는 ${BALANCE.length}문제 중 ${same(mb,p.balance)}개가 같았고, 같은 답은 ${sameTopics(mb,p.balance).join(", ")||"없음"}이에요.`:"";
+    location.hash="#counsel";send(`'${p.nickname}'님과 매칭됐어요. 상대는 ${p.age}살, ${p.region}에 살고, 관심사는 ${p.interests.join(", ")}이에요. 소개글은 "${p.bio}"예요.${bal} 부담 없이 대화를 시작할 첫 메시지를 2~3개 추천해 주세요.`)}return}
+  const gb=e.target.closest("[data-game]");
+  if(gb){
+    const a=gb.dataset.game;
+    if(a==="start")S.game={step:0,answers:[]};
+    else if(a==="result")S.game.step=BALANCE.length;
+    else if(a==="back")S.game.step=Math.max(0,S.game.step-1);
+    else if(a==="intro")S.game.step=-1;
+    renderGame();return}
+  const pk=e.target.closest("[data-pick]");
+  if(pk){pick(Number(pk.dataset.pick));return}
+  const q=e.target.closest("[data-q]");
+  if(q){send(q.dataset.q);return}
+});
+
+function toggleLike(id){
+  const p=S.profiles.find(x=>x.id===id);if(!p)return;
+  const likes=S.me.likes.includes(id)?S.me.likes.filter(x=>x!==id):[...S.me.likes,id];
+  const before=isMatch(p);
+  S.me={...S.me,likes};
+  persist();
+  renderMatch();
+  if(!before&&isMatch(p))toast(`${p.nickname}님과 매칭됐어요! 첫 메시지를 추천받아 보세요`);
+  else if(likes.includes(id))toast(`${p.nickname}님에게 좋아요를 보냈어요`);
+}
+
+/* ---------- 저장 ---------- */
+function body(me){return{gender:me.gender,nickname:me.nickname,age:me.age,region:me.region,status:me.status,interests:me.interests,bio:me.bio,likes:me.likes,balance:validBal(me.balance),updatedAt:new Date().toISOString()}}
+function persist(){
+  if(S.mode==="live"&&myRef){
+    const data=body(S.me);
+    writeChain=writeChain.then(()=>myRef.set(data)).catch(err=>{toast(saveErr(err))});
+  }else LS.set("dugeun-demo-me",S.me);
+}
+function saveErr(err){
+  const c=String(err&&err.code||"");
+  if(/permission|denied|not_granted|forbidden/i.test(c))return "저장할 권한이 없어요. 링크를 보낸 사람에게 참여 권한을 요청해 주세요.";
+  if(c==="quota_exceeded")return "회원 수가 가득 차서 저장하지 못했어요.";
+  return "저장하지 못했어요. 잠시 뒤 다시 시도해 주세요.";
+}
+
+/* ---------- 프로필 폼 ---------- */
+function buildForm(){
+  $("#region").innerHTML=`<option value="">선택</option>`+REGIONS.map(r=>`<option>${r}</option>`).join("");
+  $("#interests").innerHTML=INTERESTS.map((i,n)=>`<label><input type="checkbox" id="it-${n}" value="${i}"><span>${i}</span></label>`).join("");
+  $("#pform").addEventListener("input",()=>{S.formDirty=true;$("#bio-count").textContent=`${$("#bio").value.length} / 60`});
+  $("#interests").addEventListener("change",e=>{
+    const on=[...document.querySelectorAll("#interests input:checked")];
+    if(on.length>5){e.target.checked=false;$("#form-err").textContent="관심사는 5개까지 고를 수 있어요."}
+  });
+  $("#pform").addEventListener("submit",e=>{e.preventDefault();saveForm()});
+  $("#del-area").addEventListener("click",e=>{
+    const a=e.target.closest("[data-del]");if(!a)return;
+    if(a.dataset.del==="ask"){S.confirmDel=true}
+    else if(a.dataset.del==="cancel"){S.confirmDel=false}
+    else if(a.dataset.del==="yes"){deleteMe();return}
+    renderDel();
+  });
+}
+function fillForm(){
+  const me=S.me||LS.get("dugeun-demo-me");
+  $("#profile-lead").textContent=S.me?"프로필을 고치면 바로 다른 회원에게 반영돼요. 연락처나 실명은 적지 마세요.":"연락처나 실명은 적지 마세요. 매칭된 뒤 천천히 알려줘도 늦지 않아요.";
+  if(me){
+    const p=norm({...me,id:"x"});
+    $("#g-f").checked=p.gender==="f";$("#g-m").checked=p.gender==="m";
+    $("#nickname").value=p.nickname;$("#age").value=p.age||"";$("#region").value=p.region;
+    $("#s-single").checked=p.status==="single";$("#s-crush").checked=p.status==="crush";
+    document.querySelectorAll("#interests input").forEach(i=>i.checked=p.interests.includes(i.value));
+    $("#bio").value=p.bio;$("#bio-count").textContent=`${p.bio.length} / 60`;
+  }
+  $("#save").textContent=S.me?"프로필 수정":"프로필 저장";
+  renderDel();
+}
+function renderDel(){
+  const a=$("#del-area");
+  if(!S.me){a.innerHTML="";return}
+  a.innerHTML=S.confirmDel
+    ?`<span class="hint">프로필과 보낸 좋아요가 모두 지워져요.</span> <button type="button" class="btn small" data-del="yes">삭제</button> <button type="button" class="btn small ghost" data-del="cancel">취소</button>`
+    :`<button type="button" class="btn small ghost" data-del="ask">프로필 삭제</button>`;
+}
+function saveForm(){
+  const err=$("#form-err");err.textContent="";
+  const gender=document.querySelector("input[name=gender]:checked")?.value;
+  const status=document.querySelector("input[name=status]:checked")?.value;
+  const nickname=$("#nickname").value.trim();
+  const age=parseInt($("#age").value,10);
+  const region=$("#region").value;
+  const interests=[...document.querySelectorAll("#interests input:checked")].map(i=>i.value);
+  const bio=$("#bio").value.trim();
+  if(!gender)return err.textContent="성별을 골라 주세요.";
+  if(nickname.length<2)return err.textContent="닉네임은 2자 이상으로 적어 주세요.";
+  if(!(age>=19&&age<=60))return err.textContent="나이는 19~60 사이 숫자로 적어 주세요.";
+  if(!region)return err.textContent="지역을 골라 주세요.";
+  if(!status)return err.textContent="지금 상태를 골라 주세요.";
+  if(!interests.length)return err.textContent="관심사를 1개 이상 골라 주세요.";
+  const first=!S.me;
+  const genderChanged=S.me&&S.me.gender!==gender;
+  S.me={gender,nickname,age,region,status,interests,bio,likes:genderChanged?[]:(S.me?.likes||[]),balance:myBalance()};
+  S.formDirty=false;
+  persist();
+  renderMatch();fillForm();
+  toast(first?"프로필을 만들었어요. 이제 매칭을 둘러보세요":"프로필을 수정했어요");
+  if(first)setTimeout(()=>{location.hash="#match"},700);
+}
+function deleteMe(){
+  S.confirmDel=false;
+  if(S.mode==="live"&&myRef){writeChain=writeChain.then(()=>myRef.delete()).catch(err=>toast(saveErr(err)))}
+  else{try{localStorage.removeItem("dugeun-demo-me")}catch(e){}}
+  S.me=null;S.formDirty=false;
+  ["#nickname","#age","#bio"].forEach(s=>$(s).value="");$("#region").value="";
+  document.querySelectorAll("#pform input[type=radio],#interests input").forEach(i=>i.checked=false);
+  fillForm();renderMatch();toast("프로필을 삭제했어요");
+}
+
+/* ---------- 미니 게임: 밸런스 게임 매칭 ---------- */
+function validBal(a){return Array.isArray(a)&&a.length===BALANCE.length&&a.every(x=>x===0||x===1)?a.slice():null}
+function myBalance(){return validBal(S.me&&S.me.balance)||validBal(LS.get("dugeun-balance"))}
+function same(a,b){let n=0;a.forEach((x,i)=>{if(x===b[i])n++});return n}
+function sameTopics(a,b){return BALANCE.filter((q,i)=>a[i]===b[i]).map(q=>q.k)}
+function balLabel(n){return n>=9?"천생연분이에요":n>=7?"취향이 잘 맞아요":n>=5?"반반, 서로 배울 게 많아요":"정반대라서 끌릴지도 몰라요"}
+function dots(a,b){return `<span class="dots" role="img" aria-label="${BALANCE.length}문제 중 ${same(a,b)}개 같은 답">${a.map((x,i)=>`<i class="${x===b[i]?"on":""}"></i>`).join("")}</span>`}
+function likeBtn(p){const liked=iLike(p);return `<button class="like" type="button" data-like="${esc(p.id)}" aria-pressed="${liked}" ${S.me?"":"disabled title='프로필을 만들면 좋아요를 보낼 수 있어요'"}><svg aria-hidden="true"><use href="#i-heart"/></svg>${liked?"좋아요 보냄":"좋아요"}</button>`}
+
+function renderGame(){
+  const g=$("#game"),st=S.game.step,mine=myBalance(),N=BALANCE.length;
+  if(st<0){
+    g.innerHTML=`<div class="panel pink">
+      <strong>${N}문제 밸런스 게임</strong>
+      <p class="lead">연락 스타일부터 깻잎 논쟁까지, 연애할 때 갈리는 취향을 골라 보세요. 결과는 내 프로필에 저장되고, 같은 답을 많이 고른 이성부터 보여드려요.</p>
+      <div class="form-actions"><button class="btn" type="button" data-game="start">${mine?"다시 하기":"게임 시작"}</button>${mine?`<button class="btn ghost" type="button" data-game="result">내 결과 보기</button>`:""}</div>
+    </div>`;
+    return;
+  }
+  if(st<N){
+    const q=BALANCE[st];
+    g.innerHTML=`<div class="q-card">
+      <div class="q-top"><span class="q-num">${st+1} / ${N}</span><div class="q-bar" aria-hidden="true"><i style="width:${st/N*100}%"></i></div></div>
+      <div><p class="q-kicker">${esc(q.k)}</p><h2 class="q-title">${esc(q.q)}</h2></div>
+      <div class="q-opts">
+        <button class="opt" type="button" data-pick="0"><span class="opt-k">A</span>${esc(q.a)}</button>
+        <span class="vs" aria-hidden="true">VS</span>
+        <button class="opt" type="button" data-pick="1"><span class="opt-k">B</span>${esc(q.b)}</button>
+      </div>
+      <button class="textbtn" type="button" data-game="${st?"back":"intro"}">${st?"이전 문제로":"그만하기"}</button>
+    </div>`;
+    return;
+  }
+  // 결과
+  if(!mine){S.game.step=-1;renderGame();return}
+  const list=others();
+  const played=list.filter(p=>p.balance).map(p=>({p,n:same(mine,p.balance)})).sort((x,y)=>y.n-x.n);
+  const waiting=list.length-played.length;
+  const best=played[0];
+  let html=`<div class="panel pink">
+    <strong>${best?`가장 잘 맞는 사람은 ${esc(best.p.nickname)}님이에요 (${best.n} / ${N})`:"게임 결과를 저장했어요"}</strong>
+    <p class="lead">${S.me?"결과가 내 프로필에 저장됐어요. 같은 답을 많이 고른 사람부터 보여드려요.":"아직 프로필이 없어서 결과는 이 기기에만 저장됐어요. 프로필을 만들면 이성 회원만 골라서 보여드리고 좋아요를 보낼 수 있어요."}</p>
+    <div class="form-actions"><button class="btn" type="button" data-game="start">다시 하기</button>${S.me?"":`<a class="btn ghost" href="#profile" style="text-decoration:none">프로필 만들기</a>`}</div>
+  </div>
+  <details class="panel"><summary>내가 고른 답 보기</summary><ul class="my-ans">${BALANCE.map((q,i)=>`<li><span>${esc(q.k)}</span>${esc(mine[i]?q.b:q.a)}</li>`).join("")}</ul></details>`;
+  if(!played.length){
+    html+=`<div class="empty"><strong>아직 밸런스 게임을 한 이성 회원이 없어요</strong><span>${S.mode==="live"?"이 페이지 링크를 친구에게 공유해서 함께 해 보세요.":"다른 사람이 게임을 하면 여기에 나타나요."}</span></div>`;
+  }else{
+    html+=`<div class="grid">${played.map(({p,n})=>{
+      const m=isMatch(p),t=sameTopics(mine,p.balance);
+      return `<article class="card${m?" matched":""}">
+        <div class="card-top">${avatar(p)}
+          <div class="who"><h3>${esc(p.nickname)}<span class="age">${p.age||""}</span></h3><p class="meta">${esc(p.region)}<span class="status ${p.status}">${STATUS[p.status]}</span></p></div>
+          <div class="score"><b>${n}<small>/${N}</small></b><span>같은 답</span></div>
+        </div>
+        <div class="bal-row">${dots(mine,p.balance)}<strong class="bal-lbl">${balLabel(n)}</strong></div>
+        ${t.length?`<p class="bal-same">같은 답: ${esc(t.join(", "))}</p>`:""}
+        <div class="card-actions">${likeBtn(p)}${m?`<button class="btn small" type="button" data-first="${esc(p.id)}">첫 메시지 추천받기</button>`:""}<span class="spacer"></span>${p.example?`<span class="badge-ex">예시 프로필</span>`:""}</div>
+      </article>`;}).join("")}</div>`;
+    if(waiting)html+=`<p class="lead">아직 게임을 안 한 ${S.me?"이성 ":""}회원이 ${waiting}명 더 있어요.</p>`;
+  }
+  g.innerHTML=html;
+}
+function pick(v){
+  if(S.game.lock)return;
+  S.game.lock=true;
+  const b=document.querySelector(`.opt[data-pick="${v}"]`);if(b)b.classList.add("picked");
+  setTimeout(()=>{
+    S.game.lock=false;
+    S.game.answers[S.game.step]=v;
+    S.game.step++;
+    if(S.game.step>=BALANCE.length)finishGame();
+    renderGame();
+    const o=document.querySelector(".opt");
+    if(o&&(document.activeElement===document.body||!document.activeElement))o.focus({preventScroll:true});
+  },180);
+}
+function finishGame(){
+  const ans=validBal(S.game.answers.slice(0,BALANCE.length));
+  if(!ans)return;
+  LS.set("dugeun-balance",ans);
+  if(S.me){S.me={...S.me,balance:ans};persist()}
+  renderMatch();
+  toast("밸런스 게임 결과를 저장했어요");
+}
+
+/* ---------- 상담 ---------- */
+const GUIDE=`너는 연애 앱 '두근'의 연애 상담사야. 이 앱은 연애를 시작하고 싶거나 짝사랑 중인 사람이 써.
+- 한국어 존댓말로, 따뜻하지만 현실적으로 답해. 4~7문장 또는 짧은 목록으로, 너무 길지 않게.
+- 상대의 마음을 단정하지 말고, 사용자가 오늘이나 이번 주에 해볼 수 있는 구체적인 행동을 1~2가지 꼭 제안해. 예시 문장(카톡 문구 등)이 도움이 되면 넣어.
+- 집착, 몰래 확인하기, 상대 동의 없는 행동, 거절 뒤 계속 연락하기는 권하지 마.
+- 자해·극단적 생각 같은 위험 신호가 보이면 정신건강 위기상담 전화 109를 안내해.
+- 굵게 표시가 필요하면 **이렇게**만 써. 다른 마크다운 기호는 쓰지 마.`;
+function ctx(){
+  if(!S.me)return "";
+  return `\n[사용자 정보] ${S.me.age}살 ${S.me.gender==="f"?"여성":"남성"}, ${S.me.region}, 상태: ${STATUS[S.me.status]}, 관심사: ${S.me.interests.join(", ")}`;
+}
+function fmt(t){return esc(t).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\n/g,"<br>")}
+function renderChat(){
+  const log=$("#log");
+  log.innerHTML=S.chat.map(m=>`<div class="msg ${m.role}${m.role==="assistant"&&!m.content?" typing":""}">${m.role==="assistant"?`<span class="who-lbl">두근 상담사${m.offline?" · 기본 답변":""}</span>`:""}${m.content?fmt(m.content):"생각하는 중이에요…"}</div>`).join("");
+  scrollLog();
+  $("#send").disabled=S.busy;
+}
+function scrollLog(){const l=$("#log");l.scrollTop=l.scrollHeight}
+function history(){
+  // 인사말·실패한 답은 빼고, 같은 역할이 이어지면 합친다
+  const out=[];
+  for(const m of S.chat){
+    if(m.intro||m.failed||!m.content)continue;
+    const last=out[out.length-1];
+    if(last&&last.role===m.role)last.content+="\n"+m.content;else out.push({role:m.role,content:m.content});
+  }
+  while(out.length&&out[0].role!=="user")out.shift();
+  if(out.length)out[0]={role:"user",content:GUIDE+ctx()+"\n\n[고민]\n"+out[0].content};
+  return out;
+}
+let sampleP=null;
+async function getSample(){
+  if(!window.claude||typeof window.claude.use!=="function")return null;
+  if(!sampleP)sampleP=window.claude.use("sample").catch(()=>null);
+  return sampleP;
+}
+async function send(text){
+  text=String(text||"").trim();
+  if(!text||S.busy)return;
+  S.chat.push({role:"user",content:text});
+  const bot={role:"assistant",content:""};
+  S.chat.push(bot);S.busy=true;renderChat();
+  try{
+    const sample=await getSample();
+    if(!sample){bot.content=fallback(text);bot.offline=true}
+    else{
+      const r=await sample(history(),{cache:false,onText:({text})=>{bot.content=text;renderChat()}});
+      bot.content=r.text||bot.content;
+    }
+  }catch(err){
+    const c=err&&err.code;
+    if(c==="not_granted"){sampleP=Promise.resolve(null);bot.content=fallback(text);bot.offline=true}
+    else if(c==="rate_limited"){bot.failed=true;bot.content="질문이 많이 몰렸어요. 1분쯤 뒤에 다시 보내 주세요."}
+    else{bot.failed=true;bot.content=(err&&err.text)?err.text:"답을 받지 못했어요. 잠시 뒤 다시 보내 주세요."}
+  }
+  S.busy=false;renderChat();
+}
+function fallback(t){
+  if(/고백/.test(t))return "고백은 결과를 '정하는' 순간이 아니라 이미 쌓인 마음을 '확인하는' 순간이에요.\n**이런 신호가 3개 이상이면** 타이밍이 괜찮아요: 둘이서 만난 적이 여러 번 있다, 연락이 끊기지 않는다, 상대도 다음 약속을 먼저 잡는다.\n아직이라면 고백 대신 둘만의 약속을 한두 번 더 만들어 보세요. 예: \"지난번에 말한 그 전시, 이번 주말에 같이 갈래요?\"";
+  if(/썸|헷갈|친한/.test(t))return "썸인지 알고 싶을 땐 말보다 **행동의 방향**을 보세요. 상대가 먼저 연락하는지, 둘이 만나자는 말에 바로 응하는지, 내 이야기를 기억하는지가 중요해요.\n아래 '썸 신호 체크'로 한번 점검해 보고, 이번 주에 가볍게 둘만의 약속을 제안해 보세요.";
+  if(/연락|답장|카톡/.test(t))return "답장 속도는 마음보다 생활 패턴을 더 많이 보여줘요. 상대의 답장 간격에 내 속도를 맞추는 게 가장 부담이 적어요.\n대화를 이어가고 싶다면 질문 하나로 끝내 보세요. 예: \"오늘 점심 뭐 먹었어요? 저는 김치찌개요.\"";
+  if(/데이트|장소/.test(t))return "첫 데이트는 **1~2시간, 걸으면서 이야기할 수 있는 곳**이 좋아요. 전시 + 카페, 산책로 + 디저트처럼 두 장소를 묶으면 어색할 때 자연스럽게 이동할 수 있어요.\n대화 주제는 최근 빠져 있는 것, 여행 가고 싶은 곳, 어릴 때 꿈처럼 가볍게 시작해 보세요.";
+  if(/거절|차였|이별|정리/.test(t))return "용기 낸 것 자체로 이미 큰일을 하셨어요. 2~3주는 상대의 SNS나 대화방을 일부러 보지 않는 게 마음 정리에 도움이 돼요.\n그동안 미뤄둔 일 하나를 시작해 보세요. 마음이 너무 힘들면 109에 전화해 이야기 나눠도 괜찮아요.";
+  return "이야기해 주셔서 고마워요. 지금 마음이 어떤지, 상대와 어떤 사이인지(얼마나 알았는지, 얼마나 자주 연락하는지) 조금만 더 알려주시면 더 구체적으로 도와드릴게요.";
+}
+function initChat(){
+  S.chat=[{role:"assistant",intro:true,content:"안녕하세요, 두근 상담사예요. 짝사랑, 썸, 고백, 연락 고민 무엇이든 편하게 적어 주세요. 위의 자주 묻는 고민을 눌러도 돼요."}];
+  renderChat();
+  const q=$("#q");
+  q.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();$("#composer").requestSubmit()}});
+  q.addEventListener("input",()=>{q.style.height="auto";q.style.height=Math.min(q.scrollHeight,140)+"px"});
+  $("#composer").addEventListener("submit",e=>{e.preventDefault();const v=q.value;q.value="";q.style.height="auto";send(v)});
+}
+
+/* ---------- 썸 신호 체크 ---------- */
+function initCheck(){
+  $("#check").innerHTML=SIGNALS.map((s,i)=>`<label for="sig-${i}"><input type="checkbox" id="sig-${i}">${s}</label>`).join("");
+  $("#check").addEventListener("change",()=>{
+    const n=document.querySelectorAll("#check input:checked").length;
+    $("#meter").style.width=(n/8*100)+"%";
+    $("#verdict-sub").textContent=`${n} / 8`;
+    $("#verdict").textContent=n===0?"아직 체크 전이에요":n<=2?"아직은 좋은 친구 신호":n<=5?"썸 가능성이 보여요":"고백해 봐도 좋은 타이밍";
+  });
+}
+
+/* ---------- 데이터 연결 ---------- */
+function startDemo(){
+  if(S.mode==="live")return;
+  S.mode="demo";
+  S.profiles=SAMPLES.map(p=>norm({...p,balance:SAMPLE_BAL[p.id],example:true}));
+  const saved=LS.get("dugeun-demo-me");
+  S.me=saved?norm({...saved,id:"me"}):null;
+  if(S.me)delete S.me.id;
+  renderMatch();
+  if(location.hash==="#profile"&&!S.formDirty)fillForm();
+}
+async function connect(){
+  // 연결 전: 예시 프로필로 먼저 보여준다
+  S.profiles=SAMPLES.map(p=>norm({...p,balance:SAMPLE_BAL[p.id],example:true}));
+  const saved=LS.get("dugeun-demo-me");S.me=saved?(()=>{const m=norm({...saved,id:"me"});delete m.id;return m})():null;
+  renderMatch();
+  const c=window.claude;
+  if(!c||typeof c.use!=="function"){startDemo();return}
+  let user;
+  try{[db,user]=await Promise.all([c.use("db"),c.use("user")])}catch(e){db=null}
+  if(!db||!user){startDemo();return}
+  try{S.myId=await user.id()}catch(e){startDemo();return}
+  if(!S.myId){startDemo();return}
+  myRef=db.doc("profiles/"+S.myId);
+  S.mode="live";S.profiles=[];
+  const hadDemo=S.me;S.me=null;
+  renderMatch();
+  let gotFresh=false;
+  const timer=setTimeout(()=>{if(!gotFresh){S.stale=true;renderMatch()}},10000);
+  db.collection("profiles").onSnapshot(snap=>{
+    S.profiles=snap.docs.filter(d=>d.exists).map(d=>norm({...d.data(),id:d.id}));
+    const mine=S.profiles.find(p=>p.id===S.myId);
+    S.me=mine?(()=>{const m={...mine};delete m.id;delete m.likesYou;delete m.example;return m})():null;
+    if(!snap.metadata.fromCache){gotFresh=true;S.stale=false;clearTimeout(timer)}
+    renderMatch();
+    if(!S.formDirty&&!$("#view-profile").hidden)fillForm();
+  },err=>{
+    clearTimeout(timer);S.stale=true;renderMatch();
+  });
+  if(hadDemo&&!S.formDirty&&!$("#view-profile").hidden)fillForm();
+}
+
+buildForm();initChat();initCheck();route();connect();
+})();
+</script>
+
+</body>
+</html>
